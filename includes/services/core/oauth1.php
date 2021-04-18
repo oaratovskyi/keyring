@@ -319,31 +319,36 @@ class Keyring_Service_OAuth1 extends Keyring_Service {
 			}
 		}
 
-		$req         = $this->prepare_request( $token, $method, $url, $sign_vars );
-		$request_url = (string) $req;
+        if ($this->token->is_http_basic()) {
+            $params['headers']['Authorization'] = 'Basic ' . $this->token->token;
+            $request_url = $url;
+        } else {
+            $req = $this->prepare_request($token, $method, $url, $sign_vars);
+            $request_url = (string)$req;
 
-		if ( $this->token && $this->authorization_header ) {
-			$header                             = $req->to_header( $this->authorization_realm ); // Gives a complete header string, not just the second half
-			$bits                               = explode( ': ', $header, 2 );
-			$params['headers']['Authorization'] = $bits[1];
+            if ( $this->token && $this->authorization_header ) {
+                $header                             = $req->to_header( $this->authorization_realm ); // Gives a complete header string, not just the second half
+                $bits                               = explode( ': ', $header, 2 );
+                $params['headers']['Authorization'] = $bits[1];
 
-			// This hack was introduced for Instapaper (http://stackoverflow.com/a/9645033/1507683), which is overly strict on
-			// header formatting, but it doesn't seem to cause problems anywhere else.
-			$params['headers']['Authorization'] = str_replace( '",', '", ', $params['headers']['Authorization'] );
+                // This hack was introduced for Instapaper (http://stackoverflow.com/a/9645033/1507683), which is overly strict on
+                // header formatting, but it doesn't seem to cause problems anywhere else.
+                $params['headers']['Authorization'] = str_replace( '",', '", ', $params['headers']['Authorization'] );
 
-			Keyring_Util::debug( 'OAuth1 Authorization Header' );
-			Keyring_Util::debug( $params['headers']['Authorization'] );
+                Keyring_Util::debug('OAuth1 Authorization Header');
+                Keyring_Util::debug($params['headers']['Authorization']);
 
-			// oauth_verifier was probably added directly to the URL, need to manually remove it
-			$request_url = remove_query_arg( 'oauth_verifier', $url );
-		}
+                // oauth_verifier was probably added directly to the URL, need to manually remove it
+                $request_url = remove_query_arg('oauth_verifier', $url);
+            }
 
-		$query  = '';
-		$parsed = parse_url( $request_url );
-		if ( ! empty( $parsed['query'] ) && 'POST' === $method ) {
-			$request_url = str_replace( '?' . $parsed['query'], '', $request_url );
-			$query       = $parsed['query'];
-		}
+        }
+        $query = '';
+        $parsed = parse_url($request_url);
+        if (!empty($parsed['query']) && 'POST' === $method) {
+            $request_url = str_replace('?' . $parsed['query'], '', $request_url);
+            $query = $parsed['query'];
+        }
 
 		Keyring_Util::debug( "OAuth1 Request URL: $request_url" );
 		switch ( $method ) {

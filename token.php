@@ -114,6 +114,11 @@ class Keyring_Token {
 		// Not expired
 		return false;
 	}
+
+    function is_http_basic()
+    {
+        return (bool)$this->get_meta('basic');
+    }
 }
 
 /**

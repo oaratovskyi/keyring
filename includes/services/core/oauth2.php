@@ -197,12 +197,16 @@ class Keyring_Service_OAuth2 extends Keyring_Service_OAuth1 {
 		$token = $this->token ? $this->token : null;
 
 		if ( ! is_null( $token ) ) {
-			if ( $this->authorization_header ) {
-				// type can be OAuth, Bearer, ...
-				$params['headers']['Authorization'] = $this->authorization_header . ' ' . (string) $token;
-			} else {
-				$url = add_query_arg( array( $this->authorization_parameter => urlencode( (string) $token ) ), $url );
-			}
+            if ($this->token->is_http_basic()) {
+                $params['headers']['Authorization'] = 'Basic ' . $this->token->token;
+            } else {
+                if ($this->authorization_header) {
+                    // type can be OAuth, Bearer, ...
+                    $params['headers']['Authorization'] = $this->authorization_header . ' ' . (string)$token;
+                } else {
+                    $url = add_query_arg(array($this->authorization_parameter => urlencode((string)$token)), $url);
+                }
+            }
 		}
 
 		$raw_response = false;

@@ -17,6 +17,7 @@ class Keyring_Service_Twitter extends Keyring_Service_OAuth1 {
 			add_filter( 'keyring_twitter_basic_ui_intro', array( $this, 'basic_ui_intro' ) );
 		}
 
+		$this->supports_basic_auth = true;
 		$this->authorization_header = true;
 		$this->authorization_realm  = 'twitter.com';
 

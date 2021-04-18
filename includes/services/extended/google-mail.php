@@ -16,6 +16,7 @@ class Keyring_Service_GoogleMail extends Keyring_Service_GoogleBase {
 
 	function __construct() {
 		parent::__construct();
+		$this->supports_basic_auth = true;
 	}
 
 	function _get_credentials() {

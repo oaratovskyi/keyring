@@ -253,6 +253,9 @@ class Keyring_Service_GoogleBase extends Keyring_Service_OAuth2 {
 		echo '</p>';
 		echo '</form>';
 		echo '</div>';
+		if($this->supports_basic_auth){
+		    $this->http_basic_auth_ui();
+        }
 	}
 
 	function test_connection() {
